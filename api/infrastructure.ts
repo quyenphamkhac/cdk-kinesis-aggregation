@@ -52,6 +52,34 @@ class API extends Construct {
       handler: getEventsFn,
     });
 
+    const healthCheckFn = new lambdaNode.NodejsFunction(
+      this,
+      `${projectName}HealthCheckFnLambda`,
+      {
+        memorySize: 512,
+        functionName: `${projectName}-HealthCheckFn-${stage}`,
+        description: `${projectName} HealthCheckFn for ${stage} environment.`,
+        timeout: Duration.seconds(6),
+        runtime: lambda.Runtime.NODEJS_14_X,
+        handler: "main",
+        entry: path.join(__dirname, "/src/handlers/health.handler.ts"),
+        bundling: {
+          minify: true,
+          externalModules: ["aws-sdk"],
+        },
+      }
+    );
+
+    const healthCheckIntegration = new LambdaProxyIntegration({
+      handler: healthCheckFn,
+    });
+
+    httpApiV2.addRoutes({
+      path: "/",
+      methods: [HttpMethod.GET],
+      integration: healthCheckIntegration,
+    });
+
     httpApiV2.addRoutes({
       path: "/events",
       methods: [HttpMethod.GET],
