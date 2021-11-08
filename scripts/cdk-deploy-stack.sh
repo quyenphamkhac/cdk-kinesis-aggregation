@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+export PROJECT="Abcs"
 if [[ $# -ge 1 ]]; then
     if [ $1 == "Dev" ] || [ $1 == "Prod" ];then
         export STAGE=$1
