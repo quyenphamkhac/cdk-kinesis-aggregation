@@ -5,8 +5,8 @@ import * as path from "path";
 import * as lambdaNode from "@aws-cdk/aws-lambda-nodejs";
 import * as lambda from "@aws-cdk/aws-lambda";
 
-const stage = process.env.STAGE;
-const projectName = process.env.PROJECT;
+const stage = process.env.STAGE || "Dev";
+const projectName = process.env.PROJECT_NAME || "Abcs";
 
 class API extends Construct {
   constructor(scope: Construct, id: string) {

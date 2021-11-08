@@ -1,6 +1,9 @@
 import { Construct } from "@aws-cdk/core";
 import * as dynamodb from "@aws-cdk/aws-dynamodb";
 
+const stage = process.env.STAGE || "Dev";
+const projectName = process.env.PROJECT_NAME || "Abcs";
+
 class Database extends Construct {
   private table: dynamodb.Table;
 
@@ -8,7 +11,7 @@ class Database extends Construct {
     super(scope, id);
 
     const table = new dynamodb.Table(this, "AggregationTable", {
-      tableName: `Abcs-AggregationTable-${process.env.STAGE ?? "Dev"}`,
+      tableName: `${projectName}-AggregationTable-${stage}`,
       partitionKey: {
         name: "PK",
         type: dynamodb.AttributeType.STRING,

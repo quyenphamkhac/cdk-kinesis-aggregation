@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-export PROJECT="Abcs"
 if [[ $# -ge 1 ]]; then
     if [ $1 == "Dev" ] || [ $1 == "Prod" ];then
+        export PROJECT_NAME="Abcs"
         export STAGE=$1
         npx cdk deploy "AbcsBackend-$STAGE"
     else
