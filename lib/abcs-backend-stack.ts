@@ -6,6 +6,6 @@ export class AbcsBackendStack extends cdk.Stack {
     super(scope, id, props);
 
     // The code that defines your stack goes here
-    new Database(this, "database");
+    new Database(this, "AbcsDatabase");
   }
 }
