@@ -1,5 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import API from "../api/infrastructure";
+import Auth from "../auth/infastructure";
 import Database from "../database/infrastructure";
 
 export class AbcsBackendStack extends cdk.Stack {
@@ -9,5 +10,6 @@ export class AbcsBackendStack extends cdk.Stack {
     // The code that defines your stack goes here
     const databaseInfra = new Database(this, "AbcsDatabase");
     new API(this, "AbcsAPI", databaseInfra);
+    new Auth(this, "AbcsAuth");
   }
 }

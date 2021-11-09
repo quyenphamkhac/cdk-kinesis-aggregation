@@ -127,6 +127,19 @@
     "@aws-cdk/core" "1.131.0"
     constructs "^3.3.69"
 
+"@aws-cdk/aws-cognito@^1.131.0":
+  version "1.131.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-cognito/-/aws-cognito-1.131.0.tgz#744c583a80bbf7c5f05f3d69d9cb9c868b62b127"
+  integrity sha512-fUrgOOvZY+4JgWz9vLry9JQiHqhKH3l/Ay0l2xRnPygCa5xgMDh0VHJ2FYVysl6lIhj26uea9Sk5nTqokeTyRQ==
+  dependencies:
+    "@aws-cdk/aws-certificatemanager" "1.131.0"
+    "@aws-cdk/aws-iam" "1.131.0"
+    "@aws-cdk/aws-lambda" "1.131.0"
+    "@aws-cdk/core" "1.131.0"
+    "@aws-cdk/custom-resources" "1.131.0"
+    constructs "^3.3.69"
+    punycode "^2.1.1"
+
 "@aws-cdk/aws-dynamodb@^1.131.0":
   version "1.131.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-dynamodb/-/aws-dynamodb-1.131.0.tgz#1d05288fd9c157fc8bb79bda0d9119e262edcf0a"

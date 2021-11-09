@@ -15,7 +15,7 @@ export async function main(
 
   const statiticsRepo = new StatiticsRepository(
     ddbClient,
-    `${statiticsTableName}`
+    statiticsTableName as string
   );
 
   const item = await statiticsRepo.findOne({
