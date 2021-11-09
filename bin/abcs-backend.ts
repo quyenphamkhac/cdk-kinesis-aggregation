@@ -10,7 +10,7 @@ const envSEA = {
 
 const envUS = {
   account: "820710015775",
-  region: "ap-southeast-1",
+  region: "us-east-1",
 };
 
 const app = new cdk.App();
