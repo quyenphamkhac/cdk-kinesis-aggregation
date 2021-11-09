@@ -10,34 +10,34 @@ class Database extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, "AggregationTable", {
-      tableName: `${projectName}-AggregationTable-${stage}`,
+    const table = new dynamodb.Table(this, "StatiticsTable", {
+      tableName: `${projectName}-StatiticsTable-${stage}`,
       partitionKey: {
-        name: "PK",
+        name: "pk",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: "SK",
+        name: "sk",
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
     table.addGlobalSecondaryIndex({
-      indexName: "EventType-Index",
+      indexName: "RecordType-Index",
       partitionKey: {
-        name: "EventType",
+        name: "typename",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: "CreatedAt",
+        name: "createdAt",
         type: dynamodb.AttributeType.STRING,
       },
     });
     this.table = table;
   }
 
-  getAggregationTable(): dynamodb.Table {
+  getStatiticsTable(): dynamodb.Table {
     return this.table;
   }
 }

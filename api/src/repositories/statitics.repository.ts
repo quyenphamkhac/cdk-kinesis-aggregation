@@ -1,6 +1,6 @@
 import * as DynamoDB from "aws-sdk/clients/dynamodb";
 
-class AggregationRepository {
+class StatiticsRepository {
   dbClient: DynamoDB.DocumentClient;
   tableName: string;
 
@@ -19,4 +19,4 @@ class AggregationRepository {
   }
 }
 
-export default AggregationRepository;
+export default StatiticsRepository;
