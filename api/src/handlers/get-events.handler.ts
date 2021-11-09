@@ -19,8 +19,8 @@ export async function main(
   );
 
   const item = await statiticsRepo.findOne({
-    PK: "test",
-    SK: "test",
+    pk: "test",
+    sk: "test",
   });
 
   return {
