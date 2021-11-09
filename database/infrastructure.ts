@@ -37,7 +37,7 @@ class Database extends Construct {
     this.table = table;
   }
 
-  getTable(): dynamodb.Table {
+  getAggregationTable(): dynamodb.Table {
     return this.table;
   }
 }

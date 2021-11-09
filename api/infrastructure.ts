@@ -4,13 +4,16 @@ import { Construct, Duration } from "@aws-cdk/core";
 import * as path from "path";
 import * as lambdaNode from "@aws-cdk/aws-lambda-nodejs";
 import * as lambda from "@aws-cdk/aws-lambda";
+import Database from "../database/infrastructure";
 
 const stage = process.env.STAGE || "Dev";
 const projectName = process.env.PROJECT_NAME || "Abcs";
 
 class API extends Construct {
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, databaseInfra: Database) {
     super(scope, id);
+
+    const aggregationTable = databaseInfra.getAggregationTable();
 
     const httpApiV2 = new HttpApi(this, `${projectName}APIGatewayV2`, {
       apiName: `Abcs-API-Endpoints-${stage}`,
@@ -30,6 +33,7 @@ class API extends Construct {
       },
     });
 
+    // define get events fn: for testing purpose
     const getEventsFn = new lambdaNode.NodejsFunction(
       this,
       `${projectName}GetEventsLambda`,
@@ -45,9 +49,16 @@ class API extends Construct {
           minify: true,
           externalModules: ["aws-sdk"],
         },
+        environment: {
+          AGGREGATION_TABLE: aggregationTable.tableName,
+        },
       }
     );
 
+    // allow read write access
+    aggregationTable.grantReadWriteData(getEventsFn);
+
+    // define healcheck fn
     const getEventsIntegration = new LambdaProxyIntegration({
       handler: getEventsFn,
     });

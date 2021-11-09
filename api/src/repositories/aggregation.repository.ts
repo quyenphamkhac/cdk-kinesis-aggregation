@@ -1,25 +1,18 @@
 import * as DynamoDB from "aws-sdk/clients/dynamodb";
 
 class AggregationRepository {
-  dbClient: DynamoDB;
+  dbClient: DynamoDB.DocumentClient;
   tableName: string;
 
-  constructor(dbClient: DynamoDB, tableName: string) {
+  constructor(dbClient: DynamoDB.DocumentClient, tableName: string) {
     this.dbClient = dbClient;
     this.tableName = tableName;
   }
-  async findOne(): Promise<any> {
+  async findOne(key: DynamoDB.DocumentClient.Key): Promise<any> {
     const response = await this.dbClient
-      .getItem({
+      .get({
         TableName: this.tableName,
-        Key: {
-          PK: {
-            S: "test",
-          },
-          SK: {
-            S: "test",
-          },
-        },
+        Key: key,
       })
       .promise();
     return response.Item;
