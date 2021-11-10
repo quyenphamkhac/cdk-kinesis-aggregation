@@ -1,6 +1,6 @@
 import * as DynamoDB from "aws-sdk/clients/dynamodb";
 
-class StatiticsRepository {
+class StatisticsRepository {
   dbClient: DynamoDB.DocumentClient;
   tableName: string;
 
@@ -19,4 +19,4 @@ class StatiticsRepository {
   }
 }
 
-export default StatiticsRepository;
+export default StatisticsRepository;

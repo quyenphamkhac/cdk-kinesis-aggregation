@@ -13,7 +13,7 @@ class API extends Construct {
   constructor(scope: Construct, id: string, databaseInfra: Database) {
     super(scope, id);
 
-    const statiticsTable = databaseInfra.getStatiticsTable();
+    const statisticsTable = databaseInfra.getStatisticsTable();
 
     const httpApiV2 = new HttpApi(this, `${projectName}APIGatewayV2`, {
       apiName: `Abcs-API-Endpoints-${stage}`,
@@ -50,13 +50,13 @@ class API extends Construct {
           externalModules: ["aws-sdk"],
         },
         environment: {
-          STATITICS_TABLE_NAME: statiticsTable.tableName,
+          STATISTICS_TABLE_NAME: statisticsTable.tableName,
         },
       }
     );
 
     // allow read write access
-    statiticsTable.grantReadWriteData(getEventsFn);
+    statisticsTable.grantReadWriteData(getEventsFn);
 
     // define healcheck fn
     const getEventsIntegration = new LambdaProxyIntegration({

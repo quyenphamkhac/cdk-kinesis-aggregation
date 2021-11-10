@@ -1,24 +1,24 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import DynamoDB = require("aws-sdk/clients/dynamodb");
-import StatiticsRepository from "../repositories/statitics.repository";
+import StatisticsRepository from "../repositories/statistics.repository";
 
 const ddbClient = new DynamoDB.DocumentClient({
   region: "ap-southeast-1",
 });
 
-const statiticsTableName = process.env.STATITICS_TABLE_NAME;
+const statisticsTableName = process.env.STATISTICS_TABLE_NAME;
 
 export async function main(
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> {
   console.log("event ", event);
 
-  const statiticsRepo = new StatiticsRepository(
+  const statisticsRepo = new StatisticsRepository(
     ddbClient,
-    statiticsTableName as string
+    statisticsTableName as string
   );
 
-  const item = await statiticsRepo.findOne({
+  const item = await statisticsRepo.findOne({
     pk: "test",
     sk: "test",
   });

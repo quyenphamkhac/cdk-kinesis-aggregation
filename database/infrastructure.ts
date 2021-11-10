@@ -10,8 +10,8 @@ class Database extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const table = new dynamodb.Table(this, "StatiticsTable", {
-      tableName: `${projectName}-StatiticsTable-${stage}`,
+    const table = new dynamodb.Table(this, "StatisticsTable", {
+      tableName: `${projectName}-StatisticsTable-${stage}`,
       partitionKey: {
         name: "pk",
         type: dynamodb.AttributeType.STRING,
@@ -37,7 +37,7 @@ class Database extends Construct {
     this.table = table;
   }
 
-  getStatiticsTable(): dynamodb.Table {
+  getStatisticsTable(): dynamodb.Table {
     return this.table;
   }
 }
