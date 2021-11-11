@@ -85,6 +85,31 @@ class API extends Construct {
       handler: healthCheckFn,
     });
 
+    const proxyHandlerFn = new lambdaNode.NodejsFunction(
+      this,
+      `${projectName}ProxyHanlerFnLambda`,
+      {
+        memorySize: 512,
+        functionName: `${projectName}-ProxyHandlerFn-${stage}`,
+        description: `${projectName} ProxyHandlerFn for ${stage} environment.`,
+        timeout: Duration.seconds(6),
+        runtime: lambda.Runtime.NODEJS_14_X,
+        handler: "main",
+        entry: path.join(__dirname, "/src/handlers/proxy.handler.ts"),
+        bundling: {
+          minify: true,
+          externalModules: ["aws-sdk"],
+        },
+      }
+    );
+
+    const proxyHandlerIntegration = new LambdaProxyIntegration({
+      handler: proxyHandlerFn,
+    });
+
+    // allow read write access
+    statisticsTable.grantReadWriteData(proxyHandlerFn);
+
     httpApiV2.addRoutes({
       path: "/",
       methods: [HttpMethod.GET],
@@ -95,6 +120,12 @@ class API extends Construct {
       path: "/events",
       methods: [HttpMethod.GET],
       integration: getEventsIntegration,
+    });
+
+    httpApiV2.addRoutes({
+      path: "/user-statistics",
+      methods: [HttpMethod.GET],
+      integration: proxyHandlerIntegration,
     });
   }
 }
