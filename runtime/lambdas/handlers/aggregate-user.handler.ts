@@ -36,7 +36,7 @@ enum TypeName {
   UserStatistics = "UserStatistics",
 }
 
-const restrictKeys = ["pk", "sk", "typename", "version"];
+const restrictKeys = ["pk", "sk", "typename"];
 
 const ddb = new DynamoDB.DocumentClient();
 
@@ -103,6 +103,8 @@ export async function main(
           UpdateExpression: buildUpdateExpression(updateItem),
           ExpressionAttributeNames: buildExpressionAttributeNames(updateItem),
           ExpressionAttributeValues: buildExpressionAttributeValues(updateItem),
+          ConditionExpression:
+            "attribute_exists(#version) AND #version = :version",
           ReturnValuesOnConditionCheckFailure: "NONE",
         },
       });
@@ -112,6 +114,7 @@ export async function main(
           pk: ReportType.USER,
           sk: `DAILY#${today}`,
           typename: TypeName.UserStatistics,
+          version: 1,
         },
         newUser,
         byGender,
@@ -142,6 +145,8 @@ export async function main(
           UpdateExpression: buildUpdateExpression(updateItem),
           ExpressionAttributeNames: buildExpressionAttributeNames(updateItem),
           ExpressionAttributeValues: buildExpressionAttributeValues(updateItem),
+          ConditionExpression:
+            "attribute_exists(#version) AND #version = :version",
           ReturnValuesOnConditionCheckFailure: "NONE",
         },
       });
@@ -151,6 +156,7 @@ export async function main(
           pk: ReportType.USER,
           sk: `TOTAL`,
           typename: TypeName.UserStatistics,
+          version: 1,
         },
         newUser,
         byGender,
@@ -224,7 +230,7 @@ const getTotallyReport = async (
 };
 
 const buildAttributeMap = (
-  item: DynamoDB.DocumentClient.AttributeMap,
+  item: AttributeMap,
   newUser: number,
   byGender: GenderCounter,
   byYOB: YOBCounter,
