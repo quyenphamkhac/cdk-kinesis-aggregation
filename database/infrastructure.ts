@@ -6,6 +6,7 @@ const projectName = process.env.PROJECT_NAME || "Abcs";
 
 class Database extends Construct {
   private table: dynamodb.Table;
+  private userModelTable: dynamodb.ITable;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -34,11 +35,22 @@ class Database extends Construct {
         type: dynamodb.AttributeType.STRING,
       },
     });
+    const userModelTable = dynamodb.Table.fromTableArn(
+      this,
+      "UserTable",
+      process.env.USER_TABLE_ARN as string
+    );
+
+    this.userModelTable = userModelTable;
     this.table = table;
   }
 
   getStatisticsTable(): dynamodb.Table {
     return this.table;
+  }
+
+  getUserModelTable(): dynamodb.ITable {
+    return this.userModelTable;
   }
 }
 
