@@ -187,6 +187,7 @@ export async function main(
     console.error(
       `Error processing records. Event was [${JSON.stringify(event)}`
     );
+    console.log(error);
     callback(null, `Swallowed the error ${JSON.stringify(error)}`);
   }
 }
@@ -283,14 +284,13 @@ const buildUpdateExpression = (
   item: DynamoDB.DocumentClient.AttributeMap
 ): string => {
   let expressionSets: any[] = [];
-  const expressionNames: AttributeMap = {};
-  const expressionValues: AttributeMap = {};
 
   Object.keys(item).forEach((key) => {
     if (!restrictKeys.includes(key)) {
-      expressionNames[`#${key}`] = key;
-      expressionValues[`:${key}`] = item[key];
-      expressionSets = [...expressionSets, `#${key} = :${key}`];
+      expressionSets =
+        key === "version"
+          ? [...expressionSets, `#newVersion = :newVersion`]
+          : [...expressionSets, `#${key} = :${key}`];
     }
   });
 
@@ -301,15 +301,16 @@ const buildUpdateExpression = (
 const buildExpressionAttributeNames = (
   item: DynamoDB.DocumentClient.AttributeMap
 ): AttributeMap => {
-  let expressionSets: any[] = [];
   const expressionNames: AttributeMap = {};
-  const expressionValues: AttributeMap = {};
 
   Object.keys(item).forEach((key) => {
     if (!restrictKeys.includes(key)) {
-      expressionNames[`#${key}`] = key;
-      expressionValues[`:${key}`] = item[key];
-      expressionSets = [...expressionSets, `#${key} = :${key}`];
+      if (key === "version") {
+        expressionNames[`#${key}`] = key;
+        expressionNames["#newVersion"] = key;
+      } else {
+        expressionNames[`#${key}`] = key;
+      }
     }
   });
 
@@ -319,15 +320,16 @@ const buildExpressionAttributeNames = (
 const buildExpressionAttributeValues = (
   item: DynamoDB.DocumentClient.AttributeMap
 ): AttributeMap => {
-  let expressionSets: any[] = [];
-  const expressionNames: AttributeMap = {};
   const expressionValues: AttributeMap = {};
 
   Object.keys(item).forEach((key) => {
     if (!restrictKeys.includes(key)) {
-      expressionNames[`#${key}`] = key;
-      expressionValues[`:${key}`] = item[key];
-      expressionSets = [...expressionSets, `#${key} = :${key}`];
+      if (key === "version") {
+        expressionValues[`:${key}`] = item[key];
+        expressionValues[":newVersion"] = item[key] + 1;
+      } else {
+        expressionValues[`:${key}`] = item[key];
+      }
     }
   });
 
