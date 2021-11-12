@@ -10,8 +10,8 @@ export class AbcsBackendStack extends cdk.Stack {
 
     // The code that defines your stack goes here
     const databaseInfra = new Database(this, "AbcsDatabase");
-    new API(this, "AbcsAPI", databaseInfra);
-    new Auth(this, "AbcsAuth");
+    const authInfra = new Auth(this, "AbcsAuth");
+    new API(this, "AbcsAPI", databaseInfra, authInfra);
     new LambdaRuntime(this, "AbcsRuntime", databaseInfra);
   }
 }

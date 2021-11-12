@@ -1,20 +1,43 @@
-import { CorsHttpMethod, HttpApi, HttpMethod } from "@aws-cdk/aws-apigatewayv2";
+import {
+  CorsHttpMethod,
+  HttpApi,
+  HttpAuthorizer,
+  HttpMethod,
+} from "@aws-cdk/aws-apigatewayv2";
 import { LambdaProxyIntegration } from "@aws-cdk/aws-apigatewayv2-integrations";
 import { Construct, Duration } from "@aws-cdk/core";
 import * as path from "path";
 import * as lambdaNode from "@aws-cdk/aws-lambda-nodejs";
 import * as lambda from "@aws-cdk/aws-lambda";
 import Database from "../database/infrastructure";
+import Auth from "../auth/infastructure";
+import { HttpUserPoolAuthorizer } from "@aws-cdk/aws-apigatewayv2-authorizers";
 
 const stage = process.env.STAGE || "Dev";
 const projectName = process.env.PROJECT_NAME || "Abcs";
 
 class API extends Construct {
-  constructor(scope: Construct, id: string, databaseInfra: Database) {
+  constructor(
+    scope: Construct,
+    id: string,
+    databaseInfra: Database,
+    authInfra: Auth
+  ) {
     super(scope, id);
 
+    // abcs databases
     const statisticsTable = databaseInfra.getStatisticsTable();
     const userTable = databaseInfra.getUserModelTable();
+
+    // abcs auth user pools
+    const adminUserPool = authInfra.getAdminUserPool();
+    const adminUserPoolClients = authInfra.getUserPoolClients();
+
+    // cognito user pool authorizers
+    const cognitoAuthorizer = new HttpUserPoolAuthorizer({
+      userPool: adminUserPool,
+      userPoolClients: adminUserPoolClients,
+    });
 
     const httpApiV2 = new HttpApi(this, `${projectName}APIGatewayV2`, {
       apiName: `Abcs-API-Endpoints-${stage}`,
@@ -132,6 +155,7 @@ class API extends Construct {
       path: "/users",
       methods: [HttpMethod.GET],
       integration: proxyHandlerIntegration,
+      authorizer: cognitoAuthorizer,
     });
   }
 }

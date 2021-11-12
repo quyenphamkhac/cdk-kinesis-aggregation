@@ -5,6 +5,8 @@ const { PROJECT_NAME: projectName, STAGE: stage } = process.env;
 
 class Auth extends Construct {
   pool: cognito.UserPool;
+  userPoolClients: cognito.UserPoolClient[];
+
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
@@ -51,7 +53,18 @@ class Auth extends Construct {
       },
     });
 
+    const poolClient = pool.addClient("UserPoolWebClient");
+    this.userPoolClients = [poolClient];
+
     this.pool = pool;
+  }
+
+  getAdminUserPool(): cognito.UserPool {
+    return this.pool;
+  }
+
+  getUserPoolClients(): cognito.UserPoolClient[] {
+    return this.userPoolClients;
   }
 }
 
