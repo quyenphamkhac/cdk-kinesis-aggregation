@@ -5,43 +5,19 @@ import {
   DynamoDBStreamEvent,
 } from "aws-lambda";
 import DynamoDB = require("aws-sdk/clients/dynamodb");
+import {
+  GenderCounter,
+  YOBCounter,
+  TimeZone,
+  ReportType,
+  DiabetesStatusCounter,
+  Gender,
+  TypeName,
+  AttributeMap,
+  ModelKeys,
+} from "../types/common";
 
-enum TimeZone {
-  VN_HCM = 7,
-}
-
-type AttributeMap = { [key: string]: any };
-
-type YOBCounter = {
-  [key: string]: number;
-};
-
-type DiabetesStatusCounter = {
-  [key: string]: number;
-};
-
-type GenderCounter = {
-  male: number;
-  female: number;
-  unknown: number;
-};
-
-enum Gender {
-  MALE = "male",
-  FEMALE = "female",
-  UNKNOWN = "unknown",
-}
-
-enum ReportType {
-  USER = "USER_STATISTICS",
-}
-
-enum TypeName {
-  UserStatistics = "UserStatistics",
-}
-
-const restrictKeys = ["pk", "sk", "typename"];
-
+import * as helper from "../utils/helpers";
 const ddb = new DynamoDB.DocumentClient();
 
 export async function main(
@@ -62,13 +38,26 @@ export async function main(
 
     event.Records.forEach((record: DynamoDBRecord) => {
       if (record.eventName === "INSERT") {
-        const yob = record.dynamodb?.NewImage?.demographic?.M?.yob.N;
-        const gender = record.dynamodb?.NewImage?.demographic?.M?.gender.S;
-        const diabetesStatus =
-          record.dynamodb?.NewImage?.demographic?.M?.diabetesStatus.S;
+        let yob: string | undefined;
+        let gender: string | undefined;
+        let diabetesStatus: string | undefined;
+        // data is JSON string
+        if (record.dynamodb?.NewImage?.demographic?.S) {
+          const demographic = helper.parseJson(
+            record.dynamodb?.NewImage?.demographic?.S
+          );
+          yob = demographic.yob;
+          gender = demographic.gender;
+          diabetesStatus = demographic.diabetesStatus;
+        } else {
+          // data is map
+          yob = record.dynamodb?.NewImage?.demographic?.M?.yob.N;
+          gender = record.dynamodb?.NewImage?.demographic?.M?.gender.S;
+          diabetesStatus =
+            record.dynamodb?.NewImage?.demographic?.M?.diabetesStatus.S;
+        }
         // new user
         newUser = newUser + 1;
-
         // by yob
         if (yob) {
           byYOB[yob] = byYOB[yob] ? byYOB[yob] + 1 : 1;
@@ -296,7 +285,7 @@ const buildUpdateExpression = (
   let expressionSets: any[] = [];
 
   Object.keys(item).forEach((key) => {
-    if (!restrictKeys.includes(key)) {
+    if (!ModelKeys.includes(key)) {
       expressionSets =
         key === "version"
           ? [...expressionSets, `#newVersion = :newVersion`]
@@ -314,7 +303,7 @@ const buildExpressionAttributeNames = (
   const expressionNames: AttributeMap = {};
 
   Object.keys(item).forEach((key) => {
-    if (!restrictKeys.includes(key)) {
+    if (!ModelKeys.includes(key)) {
       if (key === "version") {
         expressionNames[`#${key}`] = key;
         expressionNames["#newVersion"] = key;
@@ -333,7 +322,7 @@ const buildExpressionAttributeValues = (
   const expressionValues: AttributeMap = {};
 
   Object.keys(item).forEach((key) => {
-    if (!restrictKeys.includes(key)) {
+    if (!ModelKeys.includes(key)) {
       if (key === "version") {
         expressionValues[`:${key}`] = item[key];
         expressionValues[":newVersion"] = item[key] + 1;
