@@ -10,6 +10,7 @@ class UserRepository {
     this.ddb = ddb;
     this.tableName = tableName;
   }
+
   async find(limit: number = 10, nextToken?: string): Promise<UserListReponse> {
     const resp = await this.ddb
       .scan({
