@@ -206,7 +206,7 @@ const getDateString = (date: Date): string => {
   let mm = date.getMonth() + 1;
   let dd = date.getDate();
   let yyyy = date.getFullYear();
-  return `${yyyy}-${mm > 9 ? "" : "0" + mm}-${(dd > 9 ? "" : "0") + dd}`;
+  return `${yyyy}-${(mm > 9 ? "" : "0") + mm}-${(dd > 9 ? "" : "0") + dd}`;
 };
 
 const getDailyReport = async (
