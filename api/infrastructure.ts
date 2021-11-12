@@ -14,6 +14,7 @@ class API extends Construct {
     super(scope, id);
 
     const statisticsTable = databaseInfra.getStatisticsTable();
+    const userTable = databaseInfra.getUserModelTable();
 
     const httpApiV2 = new HttpApi(this, `${projectName}APIGatewayV2`, {
       apiName: `Abcs-API-Endpoints-${stage}`,
@@ -100,6 +101,10 @@ class API extends Construct {
           minify: true,
           externalModules: ["aws-sdk"],
         },
+        environment: {
+          STATISTICS_TABLE_NAME: statisticsTable.tableName,
+          USER_TABLE_NAME: userTable.tableName,
+        },
       }
     );
 
@@ -109,6 +114,7 @@ class API extends Construct {
 
     // allow read write access
     statisticsTable.grantReadWriteData(proxyHandlerFn);
+    userTable.grantReadWriteData(proxyHandlerFn);
 
     httpApiV2.addRoutes({
       path: "/",
@@ -123,7 +129,7 @@ class API extends Construct {
     });
 
     httpApiV2.addRoutes({
-      path: "/user-statistics",
+      path: "/users",
       methods: [HttpMethod.GET],
       integration: proxyHandlerIntegration,
     });

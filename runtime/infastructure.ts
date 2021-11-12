@@ -42,16 +42,13 @@ class LambdaRuntime extends Construct {
     // grant write data to statistics table
     statisticsTable.grantReadWriteData(aggregateUsersFn);
 
-    const eventSource = aggregateUsersFn.addEventSourceMapping(
-      "UserTableStreamEventSource",
-      {
-        eventSourceArn: process.env.USER_STREAM_ARN as string,
-        batchSize: 10,
-        startingPosition: lambda.StartingPosition.TRIM_HORIZON,
-        bisectBatchOnError: true,
-        retryAttempts: 5,
-      }
-    );
+    aggregateUsersFn.addEventSourceMapping("UserTableStreamEventSource", {
+      eventSourceArn: process.env.USER_STREAM_ARN as string,
+      batchSize: 10,
+      startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+      bisectBatchOnError: true,
+      retryAttempts: 5,
+    });
     aggregateUsersFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [

@@ -3,7 +3,17 @@ import {
   APIGatewayProxyEventV2,
   APIGatewayProxyResultV2,
 } from "aws-lambda";
-import { APIGatewayV2Router } from "../router/apigwV2.router";
+import DynamoDB = require("aws-sdk/clients/dynamodb");
+import UserRepository from "../repositories/user.repository";
+import {
+  APIGatewayV2Handler,
+  APIGatewayV2Router,
+} from "../router/apigwV2.router";
+
+const { USER_TABLE_NAME: userTableName } = process.env;
+
+const ddb = new DynamoDB.DocumentClient();
+const userRepository = new UserRepository(ddb, <string>userTableName);
 
 export async function main(
   req: APIGatewayProxyEventV2,
@@ -12,11 +22,9 @@ export async function main(
   const router = new APIGatewayV2Router({
     routes: [
       {
-        path: "/user-statistics",
+        path: "/users",
         method: "GET",
-        handler: (req, ctx) => {
-          return `You called me: ${req.rawPath} ${ctx.eventType}`;
-        },
+        handler: getUsersHandler,
       },
     ],
     cors: true,
@@ -31,3 +39,14 @@ export async function main(
   });
   return router.serve(req, ctx);
 }
+
+const getUsersHandler: APIGatewayV2Handler = async (
+  req: APIGatewayProxyEventV2,
+  ctx: APIGatewayEventRequestContext
+): Promise<APIGatewayProxyResultV2> => {
+  const resp = await userRepository.find(10);
+  return {
+    statusCode: 200,
+    body: JSON.stringify(resp),
+  };
+};

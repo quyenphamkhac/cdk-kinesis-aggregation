@@ -1,4 +1,25 @@
 export interface User {
+  demographic: string;
+  setting: string;
+  screeningSurvey: string;
+  diagnosisSurvey: string;
+  goalSurvey: string;
+  activities: string;
+  status: string;
+  createdAt: string;
+  updatedAt: Date;
+  _lastChangedAt: Date;
+  _deleted: boolean;
+  _version: number;
+}
+
+export interface UserListReponse {
+  items: User[];
+  limit: number;
+  nextToken: string | null;
+}
+
+export interface UserV1 {
   demographic: UserDemographic;
   setting: UserSetting;
   screeningSurvey: UserScreeningSurvey;
