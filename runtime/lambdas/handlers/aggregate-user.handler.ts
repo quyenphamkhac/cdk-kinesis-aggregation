@@ -6,6 +6,10 @@ import {
 } from "aws-lambda";
 import DynamoDB = require("aws-sdk/clients/dynamodb");
 
+enum TimeZone {
+  VN_HCM = 7,
+}
+
 type AttributeMap = { [key: string]: any };
 
 type YOBCounter = {
@@ -52,7 +56,7 @@ export async function main(
     let byDiabetesStatus: DiabetesStatusCounter = {};
 
     // begin of day
-    const today = getBeginOfDay();
+    const today = getReportedDate(TimeZone.VN_HCM);
     const userDailyReport = await getDailyReport(ReportType.USER, today);
     const userTotallyReport = await getTotallyReport(ReportType.USER);
 
@@ -192,11 +196,17 @@ export async function main(
   }
 }
 
-const getBeginOfDay = (): string => {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  const today = d.toISOString();
-  return today;
+const getReportedDate = (timezone: number): string => {
+  const momentTz = new Date(new Date().getTime() + timezone * 60 * 60 * 1000);
+  const momentDate = getDateString(momentTz);
+  return momentDate;
+};
+
+const getDateString = (date: Date): string => {
+  let mm = date.getMonth() + 1;
+  let dd = date.getDate();
+  let yyyy = date.getFullYear();
+  return `${yyyy}-${mm > 9 ? "" : "0" + mm}-${(dd > 9 ? "" : "0") + dd}`;
 };
 
 const getDailyReport = async (
