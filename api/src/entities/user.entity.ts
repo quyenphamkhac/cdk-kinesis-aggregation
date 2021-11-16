@@ -1,12 +1,13 @@
 export interface User {
-  demographic: string;
-  setting: string;
-  screeningSurvey: string;
-  diagnosisSurvey: string;
-  goalSurvey: string;
-  activities: string;
+  userID: string;
+  demographic?: string;
+  setting?: string;
+  screeningSurvey?: string;
+  diagnosisSurvey?: string;
+  goalSurvey?: string;
+  activities?: string;
   status: string;
-  createdAt: string;
+  createdAt: Date;
   updatedAt: Date;
   _lastChangedAt: Date;
   _deleted: boolean;
