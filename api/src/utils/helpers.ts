@@ -10,13 +10,12 @@ export function parseJson(jsonstr: string): AttributeMap {
 
 export function encodeNextToken(key: AttributeMap | undefined): string | null {
   if (!key) return null;
-  return JSON.stringify(key);
+  return Buffer.from(JSON.stringify(key)).toString("base64");
 }
 
 export function parseNextToken(nextToken: string): AttributeMap | undefined {
   try {
-    const key = JSON.parse(nextToken);
-    return key;
+    return JSON.parse(Buffer.from(nextToken, "base64").toString("ascii"));
   } catch (error) {
     return undefined;
   }
