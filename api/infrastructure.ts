@@ -157,6 +157,20 @@ class API extends Construct {
       integration: proxyHandlerIntegration,
       authorizer: cognitoAuthorizer,
     });
+
+    httpApiV2.addRoutes({
+      path: "/user-statistics",
+      methods: [HttpMethod.GET],
+      integration: proxyHandlerIntegration,
+      authorizer: cognitoAuthorizer,
+    });
+
+    httpApiV2.addRoutes({
+      path: "/user-statistics/count",
+      methods: [HttpMethod.GET],
+      integration: proxyHandlerIntegration,
+      authorizer: cognitoAuthorizer,
+    });
   }
 }
 

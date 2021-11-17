@@ -5,8 +5,9 @@ export enum StatisticsType {
   DAILY = "DAILY",
 }
 
-export enum StatisticsKind {
+export enum StatisticsRange {
   DAILY = "DAILY",
+  TOTAL = "TOTAL",
 }
 
 export type SortDirection = "ASC" | "DESC";

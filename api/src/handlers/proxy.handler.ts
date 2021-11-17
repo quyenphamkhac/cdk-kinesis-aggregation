@@ -11,6 +11,7 @@ import {
   APIGatewayV2Handler,
   APIGatewayV2Router,
 } from "../router/apigwV2.router";
+import { StatisticsRange, StatisticsType } from "../types/common";
 
 const {
   USER_TABLE_NAME: userTableName,
@@ -39,6 +40,11 @@ export async function main(
         path: "/user-statistics",
         method: "GET",
         handler: getUserStatisticsHandler,
+      },
+      {
+        path: "/user-statistics/count",
+        method: "GET",
+        handler: getCountUserStatisticsHandler,
       },
     ],
     cors: true,
@@ -74,6 +80,20 @@ const getUserStatisticsHandler: APIGatewayV2Handler = async (
     sort: "ASC",
   };
   const resp = await statisticsRepository.find(query);
+  return {
+    statusCode: 200,
+    body: JSON.stringify(resp),
+  };
+};
+
+const getCountUserStatisticsHandler: APIGatewayV2Handler = async (
+  req: APIGatewayProxyEventV2,
+  ctx: APIGatewayEventRequestContext
+): Promise<APIGatewayProxyResultV2> => {
+  const resp = await statisticsRepository.findById(
+    StatisticsType.USER,
+    StatisticsRange.TOTAL
+  );
   return {
     statusCode: 200,
     body: JSON.stringify(resp),
