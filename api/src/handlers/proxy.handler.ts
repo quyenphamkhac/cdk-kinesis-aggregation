@@ -4,6 +4,7 @@ import {
   APIGatewayProxyResultV2,
 } from "aws-lambda";
 import DynamoDB = require("aws-sdk/clients/dynamodb");
+import { UpdateUserStatus } from "../dto/user.dto";
 import { UserStatisticsQuery } from "../interfaces/query";
 import StatisticsRepository from "../repositories/statistics.repository";
 import UserRepository from "../repositories/user.repository";
@@ -12,6 +13,7 @@ import {
   APIGatewayV2Router,
 } from "../router/apigwV2.router";
 import { StatisticsRange, StatisticsType } from "../types/common";
+import { parseJson } from "../utils/helpers";
 
 const {
   USER_TABLE_NAME: userTableName,
@@ -29,6 +31,7 @@ export async function main(
   req: APIGatewayProxyEventV2,
   ctx: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResultV2> {
+  console.log("Event: ", JSON.stringify(req));
   const router = new APIGatewayV2Router({
     routes: [
       {
@@ -46,14 +49,20 @@ export async function main(
         method: "GET",
         handler: getCountUserStatisticsHandler,
       },
+      {
+        path: "/users/{userID}/status",
+        method: "PATCH",
+        handler: updateUserStatusHandler,
+      },
     ],
     cors: true,
     debug: true,
-    errorHandler: (code, message) => ({
+    errorHandler: (code, message, err) => ({
       statusCode: code,
       body: JSON.stringify({
         statusCode: code,
         message,
+        ...err,
       }),
     }),
   });
@@ -102,6 +111,27 @@ const getCountUserStatisticsHandler: APIGatewayV2Handler = async (
   const resp = await statisticsRepository.findById(
     StatisticsType.USER,
     StatisticsRange.TOTAL
+  );
+  return {
+    statusCode: 200,
+    body: JSON.stringify(resp),
+  };
+};
+
+const updateUserStatusHandler: APIGatewayV2Handler = async (
+  req: APIGatewayProxyEventV2,
+  ctx: APIGatewayEventRequestContext
+): Promise<APIGatewayProxyResultV2> => {
+  const userID: string | undefined = req?.pathParameters?.userID;
+  const updateUserStatusDto: UpdateUserStatus = parseJson(
+    req.body as string
+  ) as UpdateUserStatus;
+  if (!userID) {
+    throw new Error("Missing UserID in path parameters");
+  }
+  const resp = await userRepository.updateUserStatus(
+    userID,
+    updateUserStatusDto
   );
   return {
     statusCode: 200,

@@ -171,6 +171,13 @@ class API extends Construct {
       integration: proxyHandlerIntegration,
       authorizer: cognitoAuthorizer,
     });
+
+    httpApiV2.addRoutes({
+      path: "/users/{userID}/status",
+      methods: [HttpMethod.PATCH],
+      integration: proxyHandlerIntegration,
+      authorizer: cognitoAuthorizer,
+    });
   }
 }
 

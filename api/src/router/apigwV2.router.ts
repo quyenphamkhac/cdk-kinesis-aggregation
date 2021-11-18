@@ -3,7 +3,6 @@ import {
   APIGatewayProxyEventV2,
   APIGatewayProxyResultV2,
 } from "aws-lambda";
-import { type } from "os";
 
 export type HttpMethod =
   | "GET"
@@ -16,6 +15,16 @@ export type HttpMethod =
   | "TRACE"
   | "PATCH";
 
+export interface HttpError {
+  errorType?: string;
+  errorMessage?: string;
+  code?: string;
+  message?: string;
+  time?: string;
+  requestId?: string;
+  statusCode: number;
+}
+
 export type APIGatewayV2Handler = (
   req: APIGatewayProxyEventV2,
   ctx: APIGatewayEventRequestContext
@@ -23,7 +32,8 @@ export type APIGatewayV2Handler = (
 
 export type ErrorHandler = (
   statusCode: number,
-  message: string
+  message: string,
+  err?: HttpError
 ) => APIGatewayProxyResultV2;
 
 export interface ProxyIntegrationRoute {
@@ -45,13 +55,11 @@ export class APIGatewayV2Router {
     this.config = config;
   }
 
-  findMatchingHandler(
-    path: string,
-    method: string
-  ): ProxyIntegrationRoute | null {
+  findMatchingHandler(routeKey: string): ProxyIntegrationRoute | null {
     const { routes } = this.config;
     const route = routes.find(
-      (route: ProxyIntegrationRoute) => route.path === path && route.method
+      (route: ProxyIntegrationRoute) =>
+        routeKey === `${route.method} ${route.path}`
     );
     if (route) return route;
     return null;
@@ -62,15 +70,23 @@ export class APIGatewayV2Router {
     ctx: APIGatewayEventRequestContext
   ): Promise<APIGatewayProxyResultV2> {
     try {
-      const path = req.requestContext.http.path;
-      const method = req.requestContext.http.method;
-      const route = this.findMatchingHandler(path, method);
+      const route = this.findMatchingHandler(req.routeKey);
       if (route) {
         return route.handler(req, ctx);
       }
       return this.config.errorHandler(404, "Route Not Found");
     } catch (error) {
-      return this.config.errorHandler(500, "Internal Server Error");
+      // need improve here for better error handling
+      // TODO: using Error Mapping
+      const statusCode = (error as HttpError).statusCode || 500;
+      const errorMessage =
+        (error as HttpError).errorMessage || "Internal Server Error";
+      console.log("DEBUG", error);
+      return this.config.errorHandler(
+        statusCode,
+        errorMessage,
+        error as HttpError
+      );
     }
   }
 }
