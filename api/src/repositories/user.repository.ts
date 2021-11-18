@@ -23,12 +23,13 @@ class UserRepository {
         Key: {
           userID: userID,
         },
-        UpdateExpression: "SET #status = :status",
+        UpdateExpression: "SET #status = :status, updatedAt = :updatedAt",
         ExpressionAttributeNames: {
           "#status": "status",
         },
         ExpressionAttributeValues: {
           ":status": payload.status,
+          ":updatedAt": new Date().toISOString(),
         },
         ReturnValues: "ALL_NEW",
       })
