@@ -43,15 +43,15 @@ class API extends Construct {
       apiName: `Abcs-API-Endpoints-${stage}`,
       description: `Abcs API endpoints for ${stage} environment`,
       corsPreflight: {
-        allowHeaders: ["Authorization"],
-        allowMethods: [
-          CorsHttpMethod.GET,
-          CorsHttpMethod.POST,
-          CorsHttpMethod.HEAD,
-          CorsHttpMethod.PUT,
-          CorsHttpMethod.PATCH,
-          CorsHttpMethod.OPTIONS,
+        allowHeaders: [
+          "content-type",
+          "x-amz-date",
+          "authorization",
+          "x-api-key",
+          "x-amz-security-token",
+          "x-amz-user-agent",
         ],
+        allowMethods: [CorsHttpMethod.ANY],
         allowOrigins: ["*"],
         maxAge: Duration.days(10),
       },
@@ -175,6 +175,13 @@ class API extends Construct {
     httpApiV2.addRoutes({
       path: "/users/{userID}/status",
       methods: [HttpMethod.PATCH],
+      integration: proxyHandlerIntegration,
+      authorizer: cognitoAuthorizer,
+    });
+
+    httpApiV2.addRoutes({
+      path: "/users/{userID}",
+      methods: [HttpMethod.POST],
       integration: proxyHandlerIntegration,
       authorizer: cognitoAuthorizer,
     });

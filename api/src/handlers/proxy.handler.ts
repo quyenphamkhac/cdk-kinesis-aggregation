@@ -54,6 +54,11 @@ export async function main(
         method: "PATCH",
         handler: updateUserStatusHandler,
       },
+      {
+        path: "/users/{userID}",
+        method: "POST",
+        handler: updateUserStatusHandler,
+      },
     ],
     cors: true,
     debug: true,
