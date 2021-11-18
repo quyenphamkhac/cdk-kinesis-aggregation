@@ -8,8 +8,8 @@ export interface UserStatisticsListResponse {
 }
 
 export interface UserStatisticsQuery {
-  from?: string;
-  to?: string;
+  from: string;
+  to: string;
   search?: string;
   limit: number;
   sort: SortDirection;

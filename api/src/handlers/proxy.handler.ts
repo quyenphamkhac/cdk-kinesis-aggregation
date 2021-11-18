@@ -64,7 +64,10 @@ const getUsersHandler: APIGatewayV2Handler = async (
   req: APIGatewayProxyEventV2,
   ctx: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResultV2> => {
-  const resp = await userRepository.find(10);
+  const nextToken = req?.queryStringParameters?.nextToken;
+  const limit = req?.queryStringParameters?.limit || 10;
+
+  const resp = await userRepository.find(+limit, nextToken);
   return {
     statusCode: 200,
     body: JSON.stringify(resp),
@@ -75,9 +78,15 @@ const getUserStatisticsHandler: APIGatewayV2Handler = async (
   req: APIGatewayProxyEventV2,
   ctx: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResultV2> => {
+  // get maximum 100 records
+  const limit = req?.queryStringParameters?.limit || 100;
   const query: UserStatisticsQuery = {
-    limit: 10,
+    limit: +limit,
     sort: "ASC",
+    // from year 2000 by default
+    from: req?.queryStringParameters?.from || "2000",
+    // to year 2999 by default
+    to: req?.queryStringParameters?.to || "2999",
   };
   const resp = await statisticsRepository.find(query);
   return {

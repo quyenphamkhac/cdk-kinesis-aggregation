@@ -50,10 +50,11 @@ class StatisticsRepository {
     const resp = await this.ddb
       .query({
         TableName: this.tableName,
-        KeyConditionExpression: "pk = :pk AND begins_with(sk,:sk)",
+        KeyConditionExpression: "pk = :pk AND sk BETWEEN :from AND :to",
         ExpressionAttributeValues: {
           ":pk": StatisticsType.USER,
-          ":sk": StatisticsRange.DAILY,
+          ":from": `${StatisticsRange.DAILY}#${query.from}`,
+          ":to": `${StatisticsRange.DAILY}#${query.to}`,
         },
         Limit: query.limit,
         ...(nextToken && { ExclusiveStartKey: parseNextToken(nextToken) }),
