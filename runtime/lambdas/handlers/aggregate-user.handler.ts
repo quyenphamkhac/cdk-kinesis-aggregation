@@ -181,7 +181,7 @@ export async function main(
       `Error processing records. Event was [${JSON.stringify(event)}`
     );
     console.log(error);
-    callback(null, `Swallowed the error ${JSON.stringify(error)}`);
+    callback(error as Error, `Swallowed the error ${JSON.stringify(error)}`);
   }
 }
 
