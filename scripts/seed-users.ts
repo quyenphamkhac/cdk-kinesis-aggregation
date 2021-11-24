@@ -10,10 +10,10 @@ AWS.config.update({
 const ddb = new DynamoDB.DocumentClient();
 seed();
 async function seed() {
-  const items: DynamoDB.DocumentClient.WriteRequests = [];
-  for (let i = 0; i <= 15; i++) {
-    items.push({
-      PutRequest: {
+  for (let i = 0; i <= 10; i++) {
+    await ddb
+      .put({
+        TableName: "UserModel-rb6txpzx2fertjokgntdmthpqi-dev",
         Item: {
           userID: uuid.v4(),
           demographic: JSON.stringify({
@@ -37,15 +37,7 @@ async function seed() {
           _deleted: false,
           _version: 1,
         },
-      },
-    });
+      })
+      .promise();
   }
-
-  await ddb
-    .batchWrite({
-      RequestItems: {
-        "UserModel-rb6txpzx2fertjokgntdmthpqi-dev": items,
-      },
-    })
-    .promise();
 }
